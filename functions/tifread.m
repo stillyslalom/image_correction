@@ -22,7 +22,7 @@ end
 tif_img = imread(path,frames(1));
 
 if n_frames > 1
-    tif_img = repmat(imread(path,1), [1 1 n_frames]);
+    tif_img = repmat(tif_img, [1 1 n_frames]);
     for i = 2:length(frames)
         tif_img(:,:,i) = imread(path,i);
     end

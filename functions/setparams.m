@@ -1,5 +1,5 @@
-function param_path = setparams(imgDir, do_bgsub)
-%% setparams('path/to/imgfolder/', true|false)
+function param_path = setparams(imgDir, do_bgsub, frame)
+%% param_path = setparams('path/to/imgfolder/', true|false, viewFrame)
 %% Attempt to load parameters from file 
 try 
     if imgDir(end) ~= '\' % Make concatenation w/ file lead to valid path
@@ -21,7 +21,6 @@ end
 
 %% Set parameters if they cannot be loaded
 pxcm = 55.5; % input('Pixels/cm (for attenuation coefficient): ');
-frame = 1; % input('Choose TIF frame used to select ROIs: ');
 
 %% Load first image frame
 baseDir = pwd;

@@ -1,4 +1,4 @@
-function out = beamcorrection(I,const_y)
+function [out, A] = beamcorrection(I,const_y)
 %% img_out = beamcorrection(img_in, const_y)
 % img_in: input image with vertical laser striations
 % const_y: region of image with constant mole-fraction acetone
