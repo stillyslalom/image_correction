@@ -41,7 +41,6 @@ X(X > X0) = X0;
 X(X < 0) = 0;
 
 Xbar = imgaussfilt(median(X,2), 2.0);
-plot(Xbar)
 
 %% Calculate output limits; return output mole fraction array
 Xlimits  = Xlimits * X0;
@@ -51,5 +50,5 @@ if iupper < 0; iupper = 1; end
 if ilower > length(Xbar); ilower = length(Xbar); end
 
 out = X(iupper:ilower, :);
-imshow(imadjust(out))
+
 return

@@ -1,6 +1,5 @@
-function out = bgsub(img, bgpath)
-bg = tifread(bgpath, 'all');
-bgmean = mean(bg,3);
+function out = bgsub(img, bg)
+bgmedian = median(bg,3);
 out = img;
 dims = size(out); 
 
@@ -11,8 +10,9 @@ else
 end
 
 for i = 1:n
-    out(:,:,i) = out(:,:,i) - bgmean;
+    min_vals = min(out(:,:,i), bgmedian);
+    out(:,:,i) = out(:,:,i) - min_vals;
 end
 
-out(out < 0) = 0; % Replace values less than zero with zero
+%out(out < 0) = 0; % Replace values less than zero with zero
 return

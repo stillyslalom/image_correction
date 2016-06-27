@@ -37,8 +37,6 @@ out = (out + Irange(1) - outrange(1)) * diff(Irange)/diff(outrange);
 
 
 %% Perform notch filter to remove banding
-
-
 F = fftshift(fft2(out)); % FFT to freq. domain, swap quadrants for clarity
 F(rm_i, rm_j) = 0;       % Remove banded regions
 M = (gausswin(ni,1) * gausswin(nj, 1)'); % Use Gaussian to remove noise

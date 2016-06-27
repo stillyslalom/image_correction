@@ -2,10 +2,7 @@ function param_path = setparams(imgDir, do_bgsub, frame)
 %% param_path = setparams('path/to/imgfolder/', true|false, viewFrame)
 %% Attempt to load parameters from file 
 try 
-    if imgDir(end) ~= '\' % Make concatenation w/ file lead to valid path
-        imgDir(end+1) = '\';
-    end
-    param_path = [imgDir 'params.mat'];
+    param_path = fullfile(imgDir, 'params.mat');
     load(param_path);
     return
 catch
@@ -20,7 +17,7 @@ catch
 end
 
 %% Set parameters if they cannot be loaded
-pxcm = 55.5; % input('Pixels/cm (for attenuation coefficient): ');
+
 
 %% Load first image frame
 baseDir = pwd;
@@ -28,6 +25,7 @@ cd(imgDir)
 [iname,idir] = uigetfile('*.tif','Select the signal .tif file');
 imgpath = [idir iname];
 img = im2double(imread(imgpath, frame));
+img = medfilt2(img); % Perform median filtering to reduce noise
 
 %% Load path to background subtraction region
 if do_bgsub
@@ -56,21 +54,22 @@ end
 [origin, lines] = laserorigin(img);
 hold on;
 title(['Verify that green lines are collinear with laser striations. '...
-       'Modify laserorigin.m if necessary. Press any key to close.']);
+       'Modify laserorigin.m if necessary.']);
 for k = 1:length(lines)
    xy = [lines(k).point1; lines(k).point2];
    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
 end
 hold off
-waitforbuttonpress; close
+pause(2); 
+close
 
-%% Save parameters to file
-param_path = [imgDir 'params.mat']; % Save params in same dir as signal img
+%% Save params in same dir as signal img
+param_path = fullfile(imgDir,'params.mat'); 
 if do_bgsub
-    save(param_path, 'pxcm', 'imgpath', 'const_molreg', 'origin', ...
+    save(param_path, 'imgpath', 'const_molreg', 'origin', ...
                     'bgpath', 'bkgd')
 else
-    save(param_path, 'pxcm', 'imgpath', 'const_molreg', 'origin')
+    save(param_path, 'imgpath', 'const_molreg', 'origin')
 end
 
 return
