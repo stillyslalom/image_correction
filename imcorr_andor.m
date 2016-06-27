@@ -4,11 +4,12 @@ addpath('functions') % Add scripts in functions folder to search path
 baseDir = pwd;
 
 %% Settings
-frames = 1:5;       % Vector of frames to load from image
+frames = 1:5;       % Vector of frames to load from image, optionally 'all'
 viewFrame = 1;      % Img frame to use for parameter generation
 do_bgsub = true;    % Perform background subtraction
 Xlimits = [0.05, 0.95]; % Relative acetone concentration lim for img crop
-pad_px = 0;         % Number of pixels to pad above/below cropped image
+pxcm = 55.5;        % Pixels per cm in imaging plane of input images
+pad_px = 1024;      % Number of pixels to pad above/below cropped image
 
 % Set directory containing image files via GUI. 
 % Comment out & set directory directly if desired.
@@ -36,10 +37,11 @@ end
 
 %% Load image (with optional background subtraction)
 img = tifread(imgpath, frames);
-n = length(frames); % Number of input images to process
+bg = tifread(bgpath, 'all');
+[ni, nj, n] = size(img); % Number of input images to process
 
 if do_bgsub
-    img = bgsub(img,bgpath);
+    img = bgsub(img,bg);
 end
 
 %% Transform image so laser striations are vertical
@@ -52,6 +54,8 @@ A = zeros(n,1);
 
 for i = 1:n
     [imgCorr(:,:,i), A(i)] = beamcorrection(imgT(:,:,i), const_y);
+    imgCorr(:,:,i) = imadjust(imgCorr(:,:,i));
+    img(:,:,i) = imadjust(img(:,:,i));
 end
 
 %% Transform back to Cartesian frame
@@ -62,7 +66,24 @@ X{n} = imgFinal(:,:,1); % Initialize output cell array for concentration
 for i = 1:n
     X{i} = acetoneX(imgFinal(:,:,i), A(i), pxcm, Xlimits, pad_px);
 end
-    
-imshow(imadjust(X{1}));
-%% Compare results
-imshowpair(imadjust(img(:,:,1)),imadjust(imgFinal(:,:,1)),'montage')
+
+%% Show results
+crop_i = const_molreg(4):bkgd(2);
+imgCrop = imgFinal(crop_i,:,n+1:end);
+imgCompare = cat(2,imgFinal(:,:,1:n),imgFinal(:,:,n+1:end));
+
+% Reshape to conform to Matlab's requirement of ni x nj x 1 x n array
+imgCrop = reshape(imgCrop,[length(crop_i),nj,1,n]);
+imgCompare = reshape(imgCompare,[ni,2*nj,1,n]);
+
+montage(imgCrop,'Size',[n 1])
+m = implay(imgCompare,1);
+mp = m.parent;
+mp.Position = ceil(get(0,'ScreenSize')/2);
+mp.Name = 'Image correction results';
+
+pause(0.5) % Wait for screen to appear
+% Simulate 'alt-t-m-p' keypress to make image player zoom to fit images
+% using 'alt-t-m', then start playback using 'p'
+keys = {'alt', 't', 'm', 'p'};
+keyrobot(keys, 0.1);
