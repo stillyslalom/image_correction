@@ -1,7 +1,7 @@
 function void = keyrobot(keylist,delay_val)
 %% keyrobot(keylist, delay_val)
 % Simulates pressing and releasing keys in cell array 'keylist'.
-% Pauses for 'delay_val' between each press/release cycle.\
+% Pauses for 'delay_val' seconds between each press/release cycle.\
 
 robot = java.awt.Robot;
 

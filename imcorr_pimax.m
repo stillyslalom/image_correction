@@ -11,6 +11,7 @@ do_bgsub = true;    % Perform background subtraction
 Xlimits = [0.05, 0.95]; % Relative acetone concentration lim for img crop
 pxcm = 55.5;        % Pixels per cm in imaging plane of input images
 pad_px = 0;         % Number of pixels to pad above/below cropped image
+remove_speckle = false; % Time-consuming intensifier speckle removal
 
 % Set directory containing image files via GUI. 
 % Comment out & set directory directly if desired.
@@ -74,6 +75,22 @@ for i = 1:2*n
     imgCorr(:,:,i) = imadjust(imgCorr(:,:,i));
 end
 
+%% Remove speckle noise using anisotropic diffusion
+if remove_speckle
+    for i = 1:2*n
+        I = imgCorr(:,:,i);
+        out=dpad(I,.2,80,'cnoise',5,'big',15,'aja','aos');
+        pctile = [2, 98];
+        Irange = prctile(I(:),pctile);
+        outrange = prctile(out(:),pctile);
+
+        Ia = clamp(out, outrange(1), outrange(2));
+
+        % Re-normalize to intensity of input image
+        Ia = (Ia + Irange(1) - outrange(1)) * diff(Irange)/diff(outrange);
+        imgCorr(:,:,i) = imadjust(Ia);
+    end
+end
 %% Transform back to Cartesian frame
 imgFinal = lasertransform(imgCorr, origin, 'inverse');
 

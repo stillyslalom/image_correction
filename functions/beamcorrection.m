@@ -10,6 +10,7 @@ sigma = 3; % For Gaussian filter of reference image for beam profile corr.
 % Select regions to remove: horizontal stripes corresponding to bands
 rm_i = (ni/2 - 3):(ni/2 + 3);
 rm_j = [(nj/4:nj/2)-10 (nj/2:3*nj/4)+10];
+pad_size = 64;  % Number of pixels to pad around FFT image
 
 %% Constants
 Irange = [min(min(I)); max(max(I))];
@@ -37,11 +38,13 @@ out = (out + Irange(1) - outrange(1)) * diff(Irange)/diff(outrange);
 
 
 %% Perform notch filter to remove banding
-F = fftshift(fft2(out)); % FFT to freq. domain, swap quadrants for clarity
-F(rm_i, rm_j) = 0;       % Remove banded regions
-M = (gausswin(ni,1) * gausswin(nj, 1)'); % Use Gaussian to remove noise
+padded = padarray(out,[64 64],'symmetric');
+F = fftshift(fft2(padded)); % FFT to freq. domain, swap quadrants for clarity
+F(rm_i + pad_size, rm_j + pad_size) = 0;       % Remove banded regions
+M = (gausswin(ni+2*pad_size,1) * gausswin(nj+2*pad_size, 1)'); % Use Gaussian to remove noise
 G = M .* F;
 out = real(ifft2(ifftshift(G)));
+out = out(pad_size + 1:ni + pad_size, pad_size + 1:nj + pad_size);
 
 return
 %imshowpair(imadjust(I),imadjust(out),'montage')
