@@ -16,7 +16,6 @@ R = imref2d([nx,ny]); % Reference image; fixes projection dimensions
 if strcmp(direction, 'inverse')
     tform = invert(tform);
 end
-
 for i = 1:nz
     fillVal = min(min(I(:,:,i)));
     out(:,:,i) = imwarp(I(:,:,i), R, tform, ...
