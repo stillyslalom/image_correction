@@ -1,7 +1,7 @@
 %% Set-up
 addpath('functions') % Add scripts in functions folder to search path
 baseDir = pwd;
-
+% added comment
 %% Settings
 frames = 11;       % Vector of frames to load from image, optionally 'all'
 do_notch = false;   % Perform FFT-based notch filter to reduce striations
