@@ -25,8 +25,19 @@ octave-workspace
 *.jpg
 *.pdf
 
+# Video files
+*.mp4
+*.m4a
+*.mov
+*.avi
+*.gif
+*.mpg
+*.wmv
+*.mkv
+
 # Thumbnail file
 Thumbs.db
+*DS_Store
 
 scratchpad.m
 external_libraries*
